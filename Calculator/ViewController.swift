@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     
     private var userIsInMiddleOfTyping = false
     
+    // function is called every time a digit button is clicked, including .
     @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         
@@ -47,6 +48,7 @@ class ViewController: UIViewController {
 
     private var brain = CalculatorBrain()
     
+    // function is called every time there is an operation or equals sign
     @IBAction private func performAction(_ sender: UIButton) {
         if userIsInMiddleOfTyping {
             brain.setOperand(operand: displayValue)

@@ -107,7 +107,7 @@
 				TargetAttributes = {
 					41E49AAE1EE7693700B84D68 = {
 						CreatedOnToolsVersion = 8.3.2;
-						DevelopmentTeam = AC54WX57MX;
+						DevelopmentTeam = 6WA6Y7KBQJ;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -275,7 +275,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = AC54WX57MX;
+				DEVELOPMENT_TEAM = 6WA6Y7KBQJ;
 				INFOPLIST_FILE = Calculator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.brandonabajelo.Calculator;
@@ -288,7 +288,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = AC54WX57MX;
+				DEVELOPMENT_TEAM = 6WA6Y7KBQJ;
 				INFOPLIST_FILE = Calculator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.brandonabajelo.Calculator;

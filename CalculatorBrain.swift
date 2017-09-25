@@ -98,7 +98,6 @@ class CalculatorBrain
                isLastButtonClear = false
 
             
-            
             case .ClearMemory:
                 clearMemory()
                 isLastButtonClear = false
@@ -179,7 +178,8 @@ class CalculatorBrain
     }
     
     var numFormatter: NumberFormatter?
-
+    
+    // formats the description of the operation to the console
     var description: String {
         
         var resultString = ""

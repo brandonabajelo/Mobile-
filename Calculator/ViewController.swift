@@ -10,6 +10,13 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
     // declaring  with ! allows you to omit ! everywhere else var is used
     @IBOutlet private weak var display: UILabel!
     
@@ -64,6 +71,27 @@ class ViewController: UIViewController {
             brain.clearPrintStack()
         }
     }
+    
+    @IBOutlet weak var variable: UITextField!
+    @IBOutlet weak var variableVal: UITextField!
+ 
+    @IBAction func use(_ sender: UIButton) {
+        variableVal.text! = ""
+        brain.setOperandVar(variableName: variable.text!)
+        displayValue = brain.variableValues[variable.text!]!
+    }
+    
+    
+    @IBAction func create(_ sender: UIButton) {
+        brain.addVariable(symbol: variable.text!, value: Double(variableVal.text!)!)
+    }
+    
+    
+    
+    
+    
+    
+    
 }
 
 

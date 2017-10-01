@@ -12,18 +12,39 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        variable.delegate = self as? UITextFieldDelegate
+        variableVal.delegate = self as? UITextFieldDelegate
+        
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    // declaring  with ! allows you to omit ! everywhere else var is used
-    @IBOutlet private weak var display: UILabel!
+    /**
+     * Called when 'return' key pressed. return NO to ignore.
+     */
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
     
-    private var userIsInMiddleOfTyping = false
+    /**
+     * Called when the user click on the view (outside the UITextField).
+     */
+     func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        self.view.endEditing(true)
+    }
+
+    
+    
+    
+    // declaring  with ! allows you to omit ! everywhere else var is used
+    @IBOutlet fileprivate weak var display: UILabel!
+    
+    fileprivate var userIsInMiddleOfTyping = false
     
     // function is called every time a digit button is clicked, including .
-    @IBAction private func touchDigit(_ sender: UIButton) {
+    @IBAction fileprivate func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         
         if userIsInMiddleOfTyping {
@@ -41,10 +62,10 @@ class ViewController: UIViewController {
         userIsInMiddleOfTyping = true
     }
 }
-    private var numberFormatter = NumberFormatter()
+    fileprivate var numberFormatter = NumberFormatter()
     
     // computed property
-    private var displayValue: Double {
+    fileprivate var displayValue: Double {
         get {
             return Double(display.text!)!
         }
@@ -53,16 +74,16 @@ class ViewController: UIViewController {
         }
     }
 
-    private var brain = CalculatorBrain()
+    fileprivate var brain = CalculatorBrain()
     
     // function is called every time there is an operation or equals sign
-    @IBAction private func performAction(_ sender: UIButton) {
+    @IBAction fileprivate func performAction(_ sender: UIButton) {
         if userIsInMiddleOfTyping {
-            brain.setOperand(operand: displayValue)
+            brain.setOperand(displayValue)
             userIsInMiddleOfTyping = false
         }
         if let mathematicalSymbol = sender.currentTitle {
-            brain.performOperation(symbol: mathematicalSymbol)
+            brain.performOperation(mathematicalSymbol)
         }
         displayValue = brain.result
         
@@ -74,24 +95,25 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var variable: UITextField!
     @IBOutlet weak var variableVal: UITextField!
+    
+   
  
     @IBAction func use(_ sender: UIButton) {
         variableVal.text! = ""
-        brain.setOperandVar(variableName: variable.text!)
+        brain.setOperandVar(variable.text!)
         displayValue = brain.variableValues[variable.text!]!
+        // brain.accumulator += Double(displayValue)
     }
     
     
     @IBAction func create(_ sender: UIButton) {
-        brain.addVariable(symbol: variable.text!, value: Double(variableVal.text!)!)
+        if let str = variable.text{
+            if let num = Double(variableVal.text!){
+                brain.addVariable(str, value: num)
+            }
+        }
+       
     }
-    
-    
-    
-    
-    
-    
-    
 }
 
 

@@ -15,7 +15,9 @@ func inverse(number x: Double) -> Double { return 1/x }
 
 class CalculatorBrain
 {
-    private var accumulator = 0.0
+     var accumulator = 0.0
+    
+    fileprivate var touchEqualButton = false
     
     var result: Double
     {
@@ -25,35 +27,38 @@ class CalculatorBrain
     }
     
     // used for clear function
-    private var isLastButtonClear = false
+    fileprivate var isLastButtonClear = false
     
     
-    private var printStack : [Any] = []
+    fileprivate var printStack : [Any] = []
     
      var variableValues = [String : Double]()
     
-    private var variableHistory = [Any]()
+    fileprivate var variableHistory = [Any]()
     
-     func setOperand(operand: Double){
-        variableHistory.append(operand)
+     func setOperand(_ operand: Double){
+        //variableHistory.append(operand)
         printStack.append(operand)
         accumulator = operand
     }
     
-     func setOperandVar(variableName: String){
-        variableHistory.append(variableName)
+     func setOperandVar(_ variableName: String){
+        //variableHistory.append(variableName)
         printStack.append(variableName)
+        accumulator = variableValues[variableName] ?? 0
+        print("Variable: \(variableName) = \(String(describing: variableValues[variableName]))")
     }
     
-     func addVariable(symbol : String, value : Double){
+     func addVariable(_ symbol : String, value : Double){
         variableValues[symbol] = value
     }
     
-    private var numFormatter: NumberFormatter?
+    fileprivate var numFormatter: NumberFormatter?
     
      var description: String {
         
         var resultString = ""
+        
         for prop in printStack {
             if let operand = prop as? Double {
                 let stringToAppend = numFormatter?.string(from: NSNumber(value: operand)) ?? String(operand)
@@ -61,13 +66,13 @@ class CalculatorBrain
             } else if let symbol = prop as? String {
                 if let operation = operations[symbol]{
                     switch operation {
-                    case .Constant, .BinaryOperation:
+                    case .constant, .binaryOperation:
                         resultString = resultString + symbol
-                    case .UnaryOperation(let printSymbol, _):
+                    case .unaryOperation(let printSymbol, _):
                         switch printSymbol {
-                        case .Postfix(let symbol):
+                        case .postfix(let symbol):
                             resultString = "(" + resultString + ")" + symbol
-                        case .Prefix(let symbol):
+                        case .prefix(let symbol):
                             resultString = symbol + "(" + resultString + ")"
                         }
                     default:
@@ -82,78 +87,83 @@ class CalculatorBrain
         
     
     // trig functions altered so results are in degrees not radians 
-    private var operations: Dictionary<String, Operations> = [
+    fileprivate var operations: Dictionary<String, Operations> = [
         
-        "π" : Operations.Constant(Double.pi),
-        "e" : Operations.Constant(M_E),
-        "√" : Operations.UnaryOperation(.Prefix("√"), sqrt),
-        "cos" : Operations.UnaryOperation(.Prefix("cos"), {cos($0*Double.pi/180)}),
-        "×" : Operations.BinaryOperation({$0 * $1}),
-        "=" : Operations.Equals,
-        "+": Operations.BinaryOperation({$0 + $1}),
-        "−": Operations.BinaryOperation({$0 - $1}),
-        "÷": Operations.BinaryOperation({$0 / $1}),
-        "sin" : Operations.UnaryOperation(.Prefix("sin"), {sin($0*Double.pi/180)}),
-        "tan" : Operations.UnaryOperation(.Prefix("tan"), {tan($0*Double.pi/180)}),
-        "x²" : Operations.UnaryOperation(.Postfix("²")) { $0 * $0 },
-        "1/x" : Operations.UnaryOperation(.Postfix("⁻¹")) { 1/$0 },
-        "MC" : Operations.ClearMemory,
-        "MR" : Operations.MemoryRecall,
-        "MS" : Operations.MemoryStore,
-        "M+" : Operations.MemoryAdd,
-        "C" : Operations.Clear
+        "π" : Operations.constant(Double.pi),
+        "e" : Operations.constant(M_E),
+        "√" : Operations.unaryOperation(.prefix("√"), sqrt),
+        "cos" : Operations.unaryOperation(.prefix("cos"), {cos($0*Double.pi/180)}),
+        "×" : Operations.binaryOperation({$0 * $1}),
+        "=" : Operations.equals,
+        "+": Operations.binaryOperation({$0 + $1}),
+        "−": Operations.binaryOperation({$0 - $1}),
+        "÷": Operations.binaryOperation({$0 / $1}),
+        "sin" : Operations.unaryOperation(.prefix("sin"), {sin($0*Double.pi/180)}),
+        "tan" : Operations.unaryOperation(.prefix("tan"), {tan($0*Double.pi/180)}),
+        "x²" : Operations.unaryOperation(.postfix("²")) { $0 * $0 },
+        "1/x" : Operations.unaryOperation(.postfix("⁻¹")) { 1/$0 },
+        "MC" : Operations.clearMemory,
+        "MR" : Operations.memoryRecall,
+        "MS" : Operations.memoryStore,
+        "M+" : Operations.memoryAdd,
+        "C" : Operations.clear
     ]
     
     // associated value of enums
-    private enum Operations {
-        case Constant(Double)
-        case UnaryOperation(PrintSymbol, (Double) -> Double)
+    fileprivate enum Operations {
+        case constant(Double)
+        case unaryOperation(PrintSymbol, (Double) -> Double)
 //        case VariableUnaryOperation(Double)
-        case BinaryOperation((Double, Double) -> Double)
-        case Equals
-        case ClearMemory
-        case MemoryRecall
-        case MemoryStore
-        case MemoryAdd
-        case Clear
+        case binaryOperation((Double, Double) -> Double)
+        case equals
+        case clearMemory
+        case memoryRecall
+        case memoryStore
+        case memoryAdd
+        case clear
         
         enum PrintSymbol {
-            case Prefix(String)
-            case Postfix(String)
+            case prefix(String)
+            case postfix(String)
         }
     }
-    private func execPendingBinary() {
+    fileprivate func execPendingBinary() {
         if pending != nil {
             accumulator = pending!.binFunction(pending!.firstOperand, accumulator)
             pending = nil
         }
+        
+        if touchEqualButton {
+            printStack.append("\(String(accumulator))")
+            touchEqualButton = false
+        }
     }
     
-    private var memory = 0.0
+    fileprivate var memory = 0.0
     
     // memory functions
-    private func clearMemory() {
+    fileprivate func clearMemory() {
         memory = 0.0
     }
     
-    private func memoryRecall() -> Double {
+    fileprivate func memoryRecall() -> Double {
         return memory
     }
     
-    private func memoryStore() {
+    fileprivate func memoryStore() {
         memory = accumulator
     }
     
-    private func memoryAdd() {
+    fileprivate func memoryAdd() {
         memory += accumulator
         
     }
     
     // creates struct
-    private var pending: BinaryInfo?
+    fileprivate var pending: BinaryInfo?
     
     // constructor for struct uses all it's vars
-    private struct BinaryInfo {
+    fileprivate struct BinaryInfo {
         var binFunction : (Double, Double) -> Double
         var firstOperand : Double
         
@@ -164,7 +174,7 @@ class CalculatorBrain
     }
     
     // clear function where if pressed once, it deletes the most recent operand, if pressed twice, it deletes the whole operation stack
-    private func clear()  {
+    fileprivate func clear()  {
         if let _ = printStack.last as? Double{
             if(isLastButtonClear){
                 accumulator = 0.0
@@ -184,56 +194,63 @@ class CalculatorBrain
         }
     }
     
-    func performOperation(symbol: String){
+    func performOperation(_ symbol: String){
         
         
         if let operation = operations[symbol]{
             
             switch operation {
                 
-            case .Constant(let associatedValue):
+            case .constant(let associatedValue):
                 accumulator = associatedValue
                 isLastButtonClear = false
+                printStack.append(symbol)
                 
                 // 'let function' assigns generic function type to unary operator
-            case .UnaryOperation(_, let function):
+            case .unaryOperation(_, let function):
                 
                 accumulator = function(accumulator)
                 isLastButtonClear = false
+                printStack.append(symbol)
+
 
                 
-            case .BinaryOperation(let function):
+            case .binaryOperation(let function):
                 execPendingBinary()
                 pending = BinaryInfo(binFunction: function, firstOperand: accumulator)
                 isLastButtonClear = false
+                printStack.append(symbol)
+
 
                
-            case .Equals:
+            case .equals:
                execPendingBinary()
                isLastButtonClear = false
+                touchEqualButton = true
+                
 
             
-            case .ClearMemory:
+            case .clearMemory:
                 clearMemory()
                 isLastButtonClear = false
 
             
-            case .MemoryRecall:
+            case .memoryRecall:
                 accumulator = memoryRecall()
                 isLastButtonClear = false
 
             
-            case .MemoryAdd:
+            case .memoryAdd:
                 memoryAdd()
                 isLastButtonClear = false
 
                 
-            case .MemoryStore:
+            case .memoryStore:
                 memoryStore()
                 isLastButtonClear = false
 
                 
-            case .Clear:
+            case .clear:
                 clear()
             
 
